@@ -1,0 +1,113 @@
+import { run, runConsole } from "../process.ts";
+
+export type DockerBindMount = {
+  type: "bind";
+  source: string;
+  target: string;
+  readonly?: boolean;
+};
+
+export type DockerUserArg = {
+  userId: string;
+  groupId: string;
+};
+
+export type DockerRunParams = {
+  command?: string;
+  args?: string[];
+  mounts?: (DockerBindMount)[];
+  user?: DockerUserArg;
+  workdir?: string;
+  envvars?: string[];
+};
+
+/// Options to run docker as current user
+export async function currentUserOpts() {
+  const groupId = (await run(["id", "-g"])).trim();
+  const userId = (await run(["id", "-u"])).trim();
+
+  const homeDir = Deno.env.get("HOME")!;
+
+  const user: DockerUserArg = {
+    userId,
+    groupId,
+  };
+
+  const mounts: DockerBindMount[] = [
+    {
+      type: "bind",
+      source: "/etc/passwd",
+      target: "/etc/passwd",
+    },
+    {
+      type: "bind",
+      source: "/etc/group",
+      target: "/etc/group",
+    },
+    {
+      type: "bind",
+      source: homeDir,
+      target: homeDir,
+    },
+  ];
+
+  return {
+    user,
+    mounts,
+  };
+}
+
+export async function dockerRun(img: string, params: DockerRunParams) {
+  const cmd = [
+    "docker",
+    "run",
+    "-t",
+    "-i",
+    "--rm",
+  ];
+  for (const m of params.mounts || []) {
+    if (m.type === "bind") {
+      const args = [
+        "--mount",
+        `type=${m.type},source=${m.source},target=${m.target},readonly=${m
+          .readonly || false}`,
+      ];
+      cmd.push(...args);
+    }
+  }
+
+  if (params.user) {
+    const args = [
+      "--user",
+      `${params.user.userId}:${params.user.groupId}`,
+    ];
+    cmd.push(...args);
+  }
+
+  if (params.workdir) {
+    const args = [
+      "--workdir",
+      `${params.workdir}`,
+    ];
+    cmd.push(...args);
+  }
+
+  for (const envv of params.envvars || []) {
+    const args = [
+      "--env",
+      envv,
+    ];
+    cmd.push(...args);
+  }
+
+  cmd.push(img);
+
+  if (params.command) {
+    cmd.push(params.command);
+  }
+  for (const arg of params.args || []) {
+    cmd.push(arg);
+  }
+
+  await runConsole(cmd);
+}
