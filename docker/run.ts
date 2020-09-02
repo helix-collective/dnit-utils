@@ -56,7 +56,8 @@ export async function currentUserOpts() {
   };
 }
 
-export async function dockerRun(img: string, params: DockerRunParams) {
+/** Build a commandline for docker run */
+export function makeDockerRunCmd(img: string, params: DockerRunParams) : string[] {
   const cmd = [
     "docker",
     "run",
@@ -104,6 +105,13 @@ export async function dockerRun(img: string, params: DockerRunParams) {
   for (const c of params.cmds) {
     cmd.push(c);
   }
+  return cmd;
+}
 
-  await runConsole(cmd);
+export async function dockerRunConsole(img: string, params: DockerRunParams) {
+  await runConsole(makeDockerRunCmd(img, params));
+}
+
+export async function dockerRun(img: string, params: DockerRunParams) : Promise<string> {
+  return run(makeDockerRunCmd(img, params));
 }
