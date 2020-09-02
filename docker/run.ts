@@ -13,8 +13,7 @@ export type DockerUserArg = {
 };
 
 export type DockerRunParams = {
-  command?: string;
-  args?: string[];
+  cmds: string[];
   mounts?: (DockerBindMount)[];
   user?: DockerUserArg;
   workdir?: string;
@@ -102,11 +101,8 @@ export async function dockerRun(img: string, params: DockerRunParams) {
 
   cmd.push(img);
 
-  if (params.command) {
-    cmd.push(params.command);
-  }
-  for (const arg of params.args || []) {
-    cmd.push(arg);
+  for (const c of params.cmds) {
+    cmd.push(c);
   }
 
   await runConsole(cmd);
