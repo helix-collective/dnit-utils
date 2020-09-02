@@ -4,6 +4,7 @@ import { path, fs } from "../deps.ts";
 import { Newtype } from "../newtype.ts";
 import { MarkerFile } from "../markerFile.ts";
 import { PathName } from "../types.ts";
+import { runConsole } from "../process.ts";
 
 /// Paths in the docker context
 export type InContextPathName = Newtype<string, "InContextPathName">;
@@ -220,18 +221,13 @@ export class DockerImage {
     );
 
     // run docker build
-    const p = Deno.run({
-      cmd: [
-        "docker",
-        "build",
-        "-t",
-        this.localName,
-        ".",
-      ],
-      cwd: this.ctxDir,
-    });
-    const result = await p.status();
-    p.close();
+    await runConsole([
+      "docker","build",
+      "-t",this.localName,
+      "."
+    ],{
+      cwd: this.ctxDir
+    })
   }
 
   async copyToCtx() {
