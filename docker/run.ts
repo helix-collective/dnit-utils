@@ -18,6 +18,7 @@ export type DockerRunParams = {
   user?: DockerUserArg;
   workdir?: string;
   envvars?: string[];
+  interactive: boolean;
 };
 
 /// Options to run docker as current user
@@ -61,10 +62,14 @@ export function makeDockerRunCmd(img: string, params: DockerRunParams) : string[
   const cmd = [
     "docker",
     "run",
-    "-t",
-    "-i",
     "--rm",
   ];
+
+  if(params.interactive) {
+    cmd.push("--tty");
+    cmd.push("--interactive");
+  }
+
   for (const m of params.mounts || []) {
     if (m.type === "bind") {
       const args = [
