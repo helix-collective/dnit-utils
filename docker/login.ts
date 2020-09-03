@@ -18,9 +18,10 @@ export async function dockerAwsLogin(
     ["aws", "ecr", "get-login-password", "--region", awsRegion],
   );
   const dockerRepoUrl = `${awsAccountId}.dkr.ecr.${awsRegion}.amazonaws.com`;
-  await runProcess({
+  const result = await runProcess({
     in: "piped",
     out: "inherit",
+    err: "inherit",
     inp: dockerLoginPassword, // pass password in on stdin
     cmd: [
       "docker",
@@ -31,4 +32,7 @@ export async function dockerAwsLogin(
       dockerRepoUrl,
     ],
   });
+  if(!result.status.success) {
+    throw new Error(`dockerAwsLogin fail - ${result.stderr} - ${result.stdout}`);
+  }
 }

@@ -10,8 +10,9 @@ export interface IoParams {
   stdout: IoOption;
   stderr: IoOption;
   stdin: IoOption;
-} /** Options for execution of processes */
+}
 
+/** Options for execution of processes */
 export type ExecOptions = {
   cwd?: string;
   env?: {
@@ -24,12 +25,6 @@ export type ExecParams = {
   cmd: string[];
 } & ExecOptions;
 
-export class ExecError extends Error {
-  public constructor(params: ExecParams, public code: number) {
-    super(`Process ${Deno.inspect(params.cmd)} failed with ${code}`);
-  }
-}
-
 /** mapping from IoOption to type of data required/expected for stdio */
 type ProcessIoValOpts = {
   "piped": string;
@@ -39,116 +34,89 @@ type ProcessIoValOpts = {
 
 type ProcessIoVal<T extends IoOption> = ProcessIoValOpts[T];
 
-/** Run a chain of processes - first and last processes can take or receive either string, inherited or null stdin/stdout. */
-export async function processPipe<Inp extends IoOption, Outp extends IoOption>(
+export type ProcessResult<Outp extends IoOption, StdErr extends IoOption> = {
+  stdout: ProcessIoVal<Outp>,
+  stderr: ProcessIoVal<StdErr>,
+  status: Deno.ProcessStatus,
+};
+
+export async function runProcess<Inp extends IoOption, Outp extends IoOption, StdErr extends IoOption>(
   params: {
-    in: Inp; /// Options for first process stdin
-    out: Outp; /// Options for last process stdout
-    stderrs?: "null" | "inherit"; /// stderr values either inherit parent process stderr or null (default: null)
-    inp: ProcessIoVal<Inp>; /// First process stdin string / or null.
-    cmds: [ExecParams, ...ExecParams[]]; /// Processes' ExecParams  (non-empty)
+    in: Inp;
+    out: Outp;
+    err: StdErr;
+    inp: ProcessIoVal<Inp>;
+    cmd: string[],
+    opts?: ExecOptions
   },
-): Promise<ProcessIoVal<Outp>> {
-  const first = 0;
-  const second = 1;
-  const last = params.cmds.length - 1;
-  const end = params.cmds.length;
+): Promise<ProcessResult<Outp, StdErr>> {
 
-  const ioOpts: IoParams[] = params.cmds.map((_, i) => ({
-    // first process has option for input on stdin (mid-pipe processes all use "piped" stdin)
-    stdin: i === first ? params.in : "piped",
+  const ioOpts: IoParams = {
+    stdin: params.in,
+    stderr: params.err,
+    stdout: params.out,
+  };
 
-    // stderrs all null or inherit (defaulting to null)
-    stderr: params.stderrs || "null",
+  const runOpts: Deno.RunOptions = {
+    cmd: params.cmd,
+    ...params.opts,
+    ...ioOpts
+  };
 
-    // last process has option for stdout output (mid-pipe processes all use "piped" stdout)
-    stdout: i === last ? params.out : "piped",
-  }));
+  /// start the process:
+  const process = Deno.run(runOpts);
 
-  // merge parameters from IoParams and ExecParams
-  const runOpts: Deno.RunOptions[] = [...params.cmds];
-  for (let i = first; i < end; ++i) {
-    runOpts[i] = { ...runOpts[i], ...ioOpts[i] };
-  }
-
-  /// start the processes:
-  const processes = runOpts.map((r) => Deno.run(r));
-
-  let result: ProcessIoVal<Outp> = null as ProcessIoVal<Outp>;
+  let stdout: ProcessIoVal<Outp> = null as ProcessIoVal<Outp>;
+  let stderr: ProcessIoVal<StdErr> = null as ProcessIoVal<StdErr>;
 
   const ioJobs: Promise<void>[] = [];
   if (params.in === "piped") {
-    /// setup write of first processes stdin - if requested
+    /// setup write of process stdin - if requested
     const inputStr: string = params.inp as string;
-    ioJobs.push(writeAllClose(inputStr, processes[first].stdin!));
+    ioJobs.push(writeAllClose(inputStr, process.stdin!));
   }
-  for (let i = second; i < end; ++i) {
-    /// setup copying all data between piped processes
-    /// async copies between Deno.Reader and Deno.Writer using Deno.copy
+  if (params.err === "piped") {
     ioJobs.push(
-      copyAllClose(processes[i - 1].stdout!, processes[i].stdin!)
-        .then(() => {}),
+      /// setup read of process stderr - if requested
+      readAllClose(process.stderr!).then((x) => {
+        stderr = x as ProcessIoVal<StdErr>;
+      }),
     );
   }
   if (params.out === "piped") {
     ioJobs.push(
       /// setup read of last process stdout - if requested
-      readAllClose(processes[last].stdout!).then((x) => {
-        result = x as ProcessIoVal<Outp>;
+      readAllClose(process.stdout!).then((x) => {
+        stdout = x as ProcessIoVal<Outp>;
       }),
     );
   }
 
   await Promise.all(ioJobs);
-  const statuses = await Promise.all(processes.map((p) => p.status()));
-  processes.forEach((p) => p.close());
+  const status = await process.status();
+  process.close();
 
-  /// Check processes exit status and throw for first non-success
-  for (let i = 0; i < statuses.length; ++i) {
-    const status = statuses[i];
-    if (status.success !== true) {
-      throw new ExecError(params.cmds[i], status.code);
-    }
-  }
-
-  return result;
-}
-
-/// Short-form run single process - all other options for stdin, stderr, stdout, cwd and envs available.
-export async function runProcess<Inp extends IoOption, Outp extends IoOption>(
-  params: {
-    in: Inp; /// Options for stdin
-    out: Outp; /// Options for stdout
-    stderrs?: "null" | "inherit"; /// stderr values either inherit parent process stderr or null (default: null)
-    inp: ProcessIoVal<Inp>; /// stdin string / or null.
-    cmd: string[];
-    opts?: ExecOptions;
-  },
-): Promise<ProcessIoVal<Outp>> {
-  return processPipe({
-    in: params.in,
-    out: params.out,
-    stderrs: params.stderrs,
-    inp: params.inp,
-    cmds: [
-      {
-        ...params.opts,
-        cmd: params.cmd,
-      },
-    ],
-  });
+  return {
+    stdout,
+    stderr,
+    status
+  };
 }
 
 /// Short-form run single process: no stdin or sterr - final output as string.
 export async function run(cmd: string[], opts?: ExecOptions): Promise<string> {
-  return runProcess({
+  const result = await runProcess({
     in: "null",
     out: "piped",
-    stderrs: "null",
+    err: "inherit",
     inp: null,
     cmd,
     opts,
   });
+  if (result.status.success !== true) {
+    throw new Error(`${cmd} - ${result.status.code} - ${result.stderr} - ${result.stdout}`);
+  }
+  return result.stdout;
 }
 
 /// run with stdin, stdout and stderr to parent io
@@ -156,13 +124,15 @@ export async function runConsole(
   cmd: string[],
   opts?: ExecOptions,
 ): Promise<void> {
-  await runProcess({
-    in: "inherit",
+  const result = await runProcess({
+    in: "null",
     out: "inherit",
-    stderrs: "inherit",
+    err: "inherit",
     inp: null,
     cmd,
     opts,
   });
-  return;
+  if (result.status.success !== true) {
+    throw new Error(`${cmd} - ${result.status.code}`);
+  };
 }
