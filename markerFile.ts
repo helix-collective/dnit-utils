@@ -1,4 +1,4 @@
-import { PathName } from "./types.ts";
+import type { PathName } from "./types.ts";
 import { TrackedFile } from "./dnit-deps.ts";
 import { path, uuid } from "./deps.ts";
 

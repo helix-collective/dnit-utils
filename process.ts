@@ -1,6 +1,6 @@
 // Subprocess utils
 
-import { readAllClose, writeAllClose, copyAllClose } from "./io.ts";
+import { readAllClose, writeAllClose } from "./io.ts";
 
 /** IO options for stdin/stdout/stderr on Deno.run */
 export type IoOption = "inherit" | "piped" | "null";

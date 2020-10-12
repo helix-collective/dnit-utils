@@ -1,5 +1,5 @@
 // dnit tasks relating to git
-import { task, TaskContext, file, Task } from "./dnit-deps.ts";
+import { task, TaskContext, Task } from "./dnit-deps.ts";
 import { semver, log } from "./deps.ts";
 
 import {

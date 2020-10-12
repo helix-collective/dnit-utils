@@ -1,13 +1,16 @@
 // Dependencies from dnit:
 
-export {
+export type {
   TaskContext,
   Action,
   IsUpToDate,
   TaskParams,
+  FileParams,
+} from "https://deno.land/x/dnit@dnit-v1.6.0/mod.ts";
+
+export {
   Task,
   TrackedFile,
-  FileParams,
 
   runAlways,
   file,
@@ -16,4 +19,4 @@ export {
   getLogger,
   exec,
   execBasic,
-} from "https://deno.land/x/dnit@dnit-v1.5.2/mod.ts";
+} from "https://deno.land/x/dnit@dnit-v1.6.0/mod.ts";

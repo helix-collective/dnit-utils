@@ -1,7 +1,7 @@
 // test/demo the Newtype
 // this test exists at compile time
 
-import { Newtype } from "./newtype.ts";
+import type { Newtype } from "./newtype.ts";
 
 {
   type StringA = Newtype<string, "StringA">;
