@@ -2,7 +2,7 @@ import {
   task,
   exec,
   runAlways,
-} from "https://deno.land/x/dnit@dnit-v1.6.0/dnit.ts";
+} from "https://deno.land/x/dnit@dnit-v1.8.0/dnit.ts";
 import { runConsole } from "../process.ts";
 
 const test = task({

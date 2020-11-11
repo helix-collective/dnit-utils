@@ -6,7 +6,7 @@ export type {
   IsUpToDate,
   TaskParams,
   FileParams,
-} from "https://deno.land/x/dnit@dnit-v1.6.0/mod.ts";
+} from "https://deno.land/x/dnit@dnit-v1.8.0/mod.ts";
 
 export {
   Task,
@@ -19,4 +19,4 @@ export {
   getLogger,
   exec,
   execBasic,
-} from "https://deno.land/x/dnit@dnit-v1.6.0/mod.ts";
+} from "https://deno.land/x/dnit@dnit-v1.8.0/mod.ts";

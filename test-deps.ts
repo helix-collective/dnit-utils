@@ -3,8 +3,6 @@
 import {
   assert,
   assertNotEquals,
-  assertStringContains,
-  assertArrayContains,
   assertMatch,
   assertNotMatch,
   assertEquals,
@@ -17,13 +15,11 @@ import {
   fail,
   unimplemented,
   unreachable,
-} from "https://deno.land/std@0.74.0/testing/asserts.ts";
+} from "https://deno.land/std@0.77.0/testing/asserts.ts";
 
 export {
   assert,
   assertNotEquals,
-  assertStringContains,
-  assertArrayContains,
   assertMatch,
   assertNotMatch,
   assertEquals,
