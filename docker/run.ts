@@ -58,14 +58,17 @@ export async function currentUserOpts() {
 }
 
 /** Build a commandline for docker run */
-export function makeDockerRunCmd(img: string, params: DockerRunParams) : string[] {
+export function makeDockerRunCmd(
+  img: string,
+  params: DockerRunParams,
+): string[] {
   const cmd = [
     "docker",
     "run",
     "--rm",
   ];
 
-  if(params.interactive) {
+  if (params.interactive) {
     cmd.push("--tty");
     cmd.push("--interactive");
   }
@@ -116,7 +119,10 @@ export function makeDockerRunCmd(img: string, params: DockerRunParams) : string[
 export async function dockerRunConsole(img: string, params: DockerRunParams) {
   await runConsole(makeDockerRunCmd(img, params));
 }
-
-export async function dockerRun(img: string, params: DockerRunParams) : Promise<string> {
+// deno-lint-ignore require-await
+export async function dockerRun(
+  img: string,
+  params: DockerRunParams,
+): Promise<string> {
   return run(makeDockerRunCmd(img, params));
 }

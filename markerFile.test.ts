@@ -1,5 +1,5 @@
 import { MarkerFile } from "./markerFile.ts";
-import { uuid, path } from "./deps.ts";
+import { path, uuid } from "./deps.ts";
 import { assertNotEquals } from "./test-deps.ts";
 
 Deno.test("Markerfile", async () => {

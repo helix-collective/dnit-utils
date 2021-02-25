@@ -1,6 +1,6 @@
-import { TrackedFile, file } from "../dnit-deps.ts";
+import { file, TrackedFile } from "../dnit-deps.ts";
 
-import { path, fs } from "../deps.ts";
+import { fs, path } from "../deps.ts";
 import { Newtype } from "../newtype.ts";
 import { MarkerFile } from "../markerFile.ts";
 import { PathName } from "../types.ts";
@@ -21,6 +21,7 @@ class ContextFile implements ContextItem {
   ) {
   }
 
+  // deno-lint-ignore require-await
   async dependencies() {
     return [this.src];
   }
@@ -42,6 +43,7 @@ class ContextFileContent implements ContextItem {
     readonly deps: TrackedFile[] = [],
   ) {}
 
+  // deno-lint-ignore require-await
   async dependencies() {
     return this.deps;
   }
@@ -121,6 +123,7 @@ export class DockerImage {
   /// Add noop dependencies
   addDeps(deps: TrackedFile[]) {
     this.items.push({
+      // deno-lint-ignore require-await
       dependencies: async () => deps,
       copyTo: () => {},
     });
@@ -222,12 +225,14 @@ export class DockerImage {
 
     // run docker build
     await runConsole([
-      "docker","build",
-      "-t",this.localName,
-      "."
-    ],{
-      cwd: this.ctxDir
-    })
+      "docker",
+      "build",
+      "-t",
+      this.localName,
+      ".",
+    ], {
+      cwd: this.ctxDir,
+    });
   }
 
   async copyToCtx() {

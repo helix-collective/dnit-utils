@@ -9,13 +9,4 @@ import * as path from "https://deno.land/std@0.77.0/path/mod.ts";
 import * as semver from "https://deno.land/x/semver@v1.0.0/mod.ts";
 import * as uuid from "https://deno.land/std@0.77.0/uuid/mod.ts";
 
-export {
-  flags,
-  fs,
-  hash,
-  io,
-  log,
-  path,
-  semver,
-  uuid,
-};
+export { flags, fs, hash, io, log, path, semver, uuid };

@@ -12,7 +12,7 @@ export async function gitLatestTag(tagPrefix: string): Promise<string> {
 }
 
 /** get most recent git commit message */
-export async function gitLastCommitMessage(): Promise<string> {
+export function gitLastCommitMessage(): Promise<string> {
   return run(["git", "log", "--pretty=oneline", "--abbrev-commit", "-1"]);
 }
 

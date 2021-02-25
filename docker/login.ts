@@ -1,6 +1,6 @@
 import { run, runProcess } from "../process.ts";
 
-import { AwsRegion, AwsAccountId } from "../types.ts";
+import { AwsAccountId, AwsRegion } from "../types.ts";
 
 export async function getAwsCliVersion(): Promise<string> {
   const awsCliVerStr = await run(["aws", "--version"]);
@@ -32,7 +32,9 @@ export async function dockerAwsLogin(
       dockerRepoUrl,
     ],
   });
-  if(!result.status.success) {
-    throw new Error(`dockerAwsLogin fail - ${result.stderr} - ${result.stdout}`);
+  if (!result.status.success) {
+    throw new Error(
+      `dockerAwsLogin fail - ${result.stderr} - ${result.stdout}`,
+    );
   }
 }
