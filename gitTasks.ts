@@ -1,12 +1,12 @@
 // dnit tasks relating to git
-import { task, TaskContext, Task } from "./dnit-deps.ts";
-import { semver, log } from "./deps.ts";
+import { Task, task, TaskContext } from "./dnit-deps.ts";
+import { log, semver } from "./deps.ts";
 
 import {
-  gitIsClean,
   gitFetchTags,
-  gitLatestTag,
+  gitIsClean,
   gitLastCommitMessage,
+  gitLatestTag,
 } from "./git.ts";
 import { confirmation } from "./io.ts";
 import { runConsole } from "./process.ts";

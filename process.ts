@@ -35,22 +35,25 @@ type ProcessIoValOpts = {
 type ProcessIoVal<T extends IoOption> = ProcessIoValOpts[T];
 
 export type ProcessResult<Outp extends IoOption, StdErr extends IoOption> = {
-  stdout: ProcessIoVal<Outp>,
-  stderr: ProcessIoVal<StdErr>,
-  status: Deno.ProcessStatus,
+  stdout: ProcessIoVal<Outp>;
+  stderr: ProcessIoVal<StdErr>;
+  status: Deno.ProcessStatus;
 };
 
-export async function runProcess<Inp extends IoOption, Outp extends IoOption, StdErr extends IoOption>(
+export async function runProcess<
+  Inp extends IoOption,
+  Outp extends IoOption,
+  StdErr extends IoOption,
+>(
   params: {
     in: Inp;
     out: Outp;
     err: StdErr;
     inp: ProcessIoVal<Inp>;
-    cmd: string[],
-    opts?: ExecOptions
+    cmd: string[];
+    opts?: ExecOptions;
   },
 ): Promise<ProcessResult<Outp, StdErr>> {
-
   const ioOpts: IoParams = {
     stdin: params.in,
     stderr: params.err,
@@ -60,7 +63,7 @@ export async function runProcess<Inp extends IoOption, Outp extends IoOption, St
   const runOpts: Deno.RunOptions = {
     cmd: params.cmd,
     ...params.opts,
-    ...ioOpts
+    ...ioOpts,
   };
 
   /// start the process:
@@ -99,7 +102,7 @@ export async function runProcess<Inp extends IoOption, Outp extends IoOption, St
   return {
     stdout,
     stderr,
-    status
+    status,
   };
 }
 
@@ -114,7 +117,9 @@ export async function run(cmd: string[], opts?: ExecOptions): Promise<string> {
     opts,
   });
   if (result.status.success !== true) {
-    throw new Error(`${cmd} - ${result.status.code} - ${result.stderr} - ${result.stdout}`);
+    throw new Error(
+      `${cmd} - ${result.status.code} - ${result.stderr} - ${result.stdout}`,
+    );
   }
   return result.stdout;
 }
@@ -134,5 +139,5 @@ export async function runConsole(
   });
   if (result.status.success !== true) {
     throw new Error(`${cmd} - ${result.status.code}`);
-  };
+  }
 }

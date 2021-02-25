@@ -87,7 +87,10 @@ import type { Newtype } from "./newtype.ts";
   // @ts-expect-error : Newtype enforces same type usage as the wrapped type
   const xA: StringMapA = "no";
 
+  // deno-lint-ignore prefer-const
   let vA: StringMapA = { x: 1, y: 2, z: 3 };
+
+  // deno-lint-ignore prefer-const
   let vB: StringMapA = { p: 10, q: 2, r: 4 };
 
   // transparently converts back to underlying type if you ask for it

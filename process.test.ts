@@ -1,6 +1,6 @@
 import { assertEquals, assertThrowsAsync } from "./test-deps.ts";
 
-import { runProcess, run, runConsole } from "./process.ts";
+import { run, runConsole, runProcess } from "./process.ts";
 
 Deno.test("Process - stdin stdout", async () => {
   const res = await runProcess({
@@ -19,7 +19,7 @@ Deno.test("Process - stdin stdout", async () => {
     out: "inherit",
     err: "piped",
     inp: "hello world",
-    cmd: ["/bin/sh","-c","cat 1>&2"],
+    cmd: ["/bin/sh", "-c", "cat 1>&2"],
   });
 
   assertEquals(res2.stderr, "hello world");
@@ -32,7 +32,7 @@ Deno.test("Process - inherit", async () => {
     out: "inherit",
     err: "inherit",
     inp: "hello world",
-    cmd: ["cat"]
+    cmd: ["cat"],
   });
 
   // output went to parent process stdout
@@ -40,11 +40,11 @@ Deno.test("Process - inherit", async () => {
 });
 
 Deno.test("Process - runConsole", async () => {
-  await runConsole(["echo","helloworld"]);
+  await runConsole(["echo", "helloworld"]);
 });
 
 Deno.test("Process - runConsole throws on failure", async () => {
-  await assertThrowsAsync( async()=>{
+  await assertThrowsAsync(async () => {
     // the process called "false" that always fails
     await runConsole(["false"]);
   });
@@ -56,7 +56,7 @@ Deno.test("Process - run", async () => {
 });
 
 Deno.test("Process - run throws on failure", async () => {
-  await assertThrowsAsync( async()=>{
+  await assertThrowsAsync(async () => {
     // the process called "false" that always fails
     await run(["false"]);
   });
