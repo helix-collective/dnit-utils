@@ -124,13 +124,13 @@ export async function run(cmd: string[], opts?: ExecOptions): Promise<string> {
   return result.stdout;
 }
 
-/// run with stdin, stdout and stderr to parent io
+/// run with stdin, stdout and stderr to inherit parent io
 export async function runConsole(
   cmd: string[],
   opts?: ExecOptions,
 ): Promise<void> {
   const result = await runProcess({
-    in: "null",
+    in: "inherit",
     out: "inherit",
     err: "inherit",
     inp: null,
