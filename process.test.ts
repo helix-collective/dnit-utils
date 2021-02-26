@@ -61,3 +61,15 @@ Deno.test("Process - run throws on failure", async () => {
     await run(["false"]);
   });
 });
+
+/// test that runConsole passes stdin, stdout and stderr
+/// So that the inner process can operate as a terminal
+Deno.test('Process - runConsole - is a tty', async () => {
+  await runConsole(['test','-t', '0']);
+  await runConsole(['test','-t', '1']);
+  await runConsole(['test','-t', '2']);
+});
+
+Deno.test('Process - runConsole - docker run -ti', async () => {
+  await runConsole(['docker','run','-ti','debian','echo','foo']);
+});
