@@ -15,7 +15,7 @@ import {
   fail,
   unimplemented,
   unreachable,
-} from "https://deno.land/std@0.91.0/testing/asserts.ts";
+} from "https://deno.land/std@0.97.0/testing/asserts.ts";
 
 export {
   assert,

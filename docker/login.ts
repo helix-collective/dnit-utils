@@ -13,10 +13,11 @@ export async function dockerAwsLogin(
   awsAccountId: AwsAccountId,
 ) {
   // https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
-
+  // both aws v1 and v2 support get-login-password
   const dockerLoginPassword = await run(
     ["aws", "ecr", "get-login-password", "--region", awsRegion],
   );
+
   const dockerRepoUrl = `${awsAccountId}.dkr.ecr.${awsRegion}.amazonaws.com`;
   const result = await runProcess({
     in: "piped",

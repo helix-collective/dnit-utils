@@ -56,7 +56,7 @@ export async function readAllClose(
   reader: Deno.Reader & Deno.Closer,
 ): Promise<string> {
   const decoder = new TextDecoder();
-  const buf = await Deno.readAll(reader);
+  const buf = await io.readAll(reader);
   reader.close();
   return decoder.decode(buf);
 }
