@@ -27,7 +27,7 @@ export async function writeAllClose(
 ): Promise<void> {
   const encoder = new TextEncoder();
   const buf = encoder.encode(content);
-  await Deno.writeAll(dest, buf);
+  await io.writeAll(dest, buf);
   dest.close();
 }
 
