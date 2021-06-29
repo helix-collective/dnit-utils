@@ -1,6 +1,7 @@
 name: Deno test
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -12,15 +13,15 @@ jobs:
 
     strategy:
       matrix:
-        deno: ["v1.x", "nightly"]
-        os: [ubuntu-latest]
+        deno: ["v1.11.x","v1.10.x","v1.9.x","v1.8.x"]
+        os: [macOS-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
 
       - name: Setup Deno
-        uses: denolib/setup-deno@v2.3.0
+        uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.deno }} # tests across multiple Deno versions
 
