@@ -10,7 +10,7 @@ Deno.test("DockerImage test", async () => {
   const testDir = path.join(".test", uuid.v4.generate());
   const ctxDir = path.join(testDir, "docker_ctxdir");
 
-  const dockerfile = file('Dockerfile');
+  const dockerfile = file('docker/Dockerfile.test');
   const testmsg = "testmsg" + uuid.v4.generate();
 
   const context = FT.fileTree([
