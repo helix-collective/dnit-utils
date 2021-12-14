@@ -1,0 +1,2 @@
+  dockerImage.fromImage("ubuntu", "18.04");
+  dockerImage.addCmd("COPY test/helloworld.txt /tmp");
