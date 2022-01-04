@@ -140,7 +140,7 @@ export function fileWithContent(targetpath: string, content: string, options?: F
 
 
 /**
- * Compose multiple filetrees into a single oe
+ * Compose multiple filetrees into a single one
  */
  export function fileTree<D>(ftgens: FileTreeGen<D>[]): FileTreeGen<D> {
   async function unpack(toPath: string): Promise<void> {
